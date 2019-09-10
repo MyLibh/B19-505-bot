@@ -28,6 +28,9 @@
     <Compile Include="src\Config.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="src\db.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="src\Logger.py">
       <SubType>Code</SubType>
     </Compile>

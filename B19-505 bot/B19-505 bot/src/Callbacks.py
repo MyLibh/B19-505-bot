@@ -1,6 +1,7 @@
 import random
 import re
 from src.Logger import Log
+from src.db import db
 
 def OnEventNew(api, event):
     Log('MSG: ' + str(event.obj.from_id) + ' ' + event.obj.text)
@@ -16,11 +17,11 @@ def OnEventNew(api, event):
 
     if cmd == 'help':
         api.messages.send(user_id=event.obj.from_id, message='help - показать, что я умею\n\nДля редакторов:\nsendall - послать всем', reply_to=event.obj.id, random_id=random.randint(0, 2e10))
-    elif cmd == 'Start':
-        with open('data/users.txt', 'a') as users:
-            users.write(str(event.obj.from_id) + '\n')
-
-        api.messages.send(user_id=event.obj.from_id, message='Теперь ты подписан на рассылку', reply_to=event.obj.id, random_id=random.randint(0, 2e10))
+    elif cmd.lower() == 'start' or cmd.lower() == 'начать':
+        if db.add_user(id=event.obj.from_id) == True:
+            api.messages.send(user_id=event.obj.from_id, message='Теперь ты подписан на рассылку', reply_to=event.obj.id, random_id=random.randint(0, 2e10))
+        else:
+            api.messages.send(user_id=event.obj.from_id, message='Ты уже подписан', reply_to=event.obj.id, random_id=random.randint(0, 2e10))
     elif cmd == 'sendall' and 1:
         with open('data/users.txt') as users:
             lines = users.readlines()
@@ -40,13 +41,7 @@ def OnEventJoin(api, event):
 def OnEventLeave(api, event):
     Log('LEAVE: ' + str(event.obj.user_id))
 
-    with open('data/users.txt', 'r+') as users:
-        lines = users.readlines()
-        users.seek(0)
-        for line in lines:
-            if int(line) != event.obj.user_id:
-                users.write(line)
-        users.truncate()
+    db.remove_user(event.obj.user_id)
 
     api.messages.send(user_id=event.obj.user_id, message='Очень жаль, что ты покидаешь нас. Пока', random_id=random.randint(0, 2e10))
 
