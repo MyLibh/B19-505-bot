@@ -6,7 +6,6 @@ class Config(object):
                 tmp = line.split('=')
                 dic[tmp[0]] = tmp[1].replace('\n', '')
 
-        self.token = dic['token']
+        self.token    = dic['token']
         self.group_id = dic['group_id']
-
 
