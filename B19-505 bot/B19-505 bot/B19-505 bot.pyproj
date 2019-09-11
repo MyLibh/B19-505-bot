@@ -22,6 +22,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="B19_505_bot.py" />
+    <Compile Include="src\BotKeyboard.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="src\Callbacks.py">
       <SubType>Code</SubType>
     </Compile>
@@ -29,6 +32,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="src\db.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\Diary.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="src\Logger.py">
@@ -46,6 +52,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="config\credentials.txt" />
+    <Content Include="data\admins.txt" />
+    <Content Include="data\editors.txt" />
     <Content Include="data\users.txt" />
     <Content Include="logs\log-2019-09-08.log" />
   </ItemGroup>

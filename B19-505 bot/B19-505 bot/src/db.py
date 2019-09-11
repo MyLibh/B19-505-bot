@@ -1,24 +1,36 @@
 class db(object):
-    def __init__(self):
-        self.users = set()
+    users = set()
+    editors = set()
+    admins = set()
+    def load():
         with open('data/users.txt') as db_users:
-            lines = db_users.readlines()
+            for user in db_users.readlines():
+                db.users.add(int(user))
 
-            for user in lines:
-                self.users.add(int(user))
+        with open('data/editors.txt') as db_editors:
+            for user in db_editors.readlines():
+                db.editors.add(int(user))
 
-    def __del__(self):
-        with open('data/users.txt', 'w') as db_users:
-            for user in self.users:
-                db_users.write(str(user) + '\n')
+        with open('data/admins.txt') as db_admins:
+            for user in db_admins.readlines():
+                db.admins.add(int(user))
 
-    def add_user(self, id):
-        if id not in self.users:
-            self.users.add(int(id))
+    @staticmethod
+    def add_user(id):
+        if id not in db.users:
+            db.users.add(int(id))
+            with open('data/users.txt', 'w') as db_users:
+                for user in db.users:
+                    db_users.write(str(user) + '\n')
 
             return True
         else:
             return False
 
+    @staticmethod
     def remove_user(self, id):
-        self.users.discard(id)
+        db.users.discard(id)
+
+        with open('data/users.txt', 'w') as db_users:
+            for user in db.users:
+                db_users.write(str(user) + '\n')
