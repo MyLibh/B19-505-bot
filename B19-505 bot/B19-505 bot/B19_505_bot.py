@@ -13,13 +13,15 @@ def main():
     vk         = vk_session.get_api()
     longpoll   = VkBotLongPoll(vk_session, config.group_id)
 
+    review = '[UPDATE] v1.0\nТеперь домашка будет появляться\n\nХочешь помочь в обновлении дз/инфы? пиши @big_black_hot_brother'
+
     for user_id in src.db.db.users:
         if user_id in src.db.db.admins:
-            src.BotKeyboard.BotKeyboard.send_menu_keyboard(vk, user_id, perms=31415926)
+           src.BotKeyboard.BotKeyboard.send_menu_keyboard(vk, user_id, perms=31415926, msg=review)
         elif user_id in src.db.db.editors:
-            src.BotKeyboard.BotKeyboard.send_menu_keyboard(vk, user_id, perms=5)
+           src.BotKeyboard.BotKeyboard.send_menu_keyboard(vk, user_id, perms=5, msg=review)
         else:
-            src.BotKeyboard.BotKeyboard.send_menu_keyboard(vk, user_id)
+           src.BotKeyboard.BotKeyboard.send_menu_keyboard(vk, user_id, msg=review)
 
     src.Logger.Log('Bot started')
         

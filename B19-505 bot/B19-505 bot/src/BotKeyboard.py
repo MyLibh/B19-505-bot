@@ -3,7 +3,7 @@ from vk_api.utils import get_random_id
 
 
 class BotKeyboard(object):
-    def send_menu_keyboard(api, user_id, msg='Смотри, какие классные виджеты)', perms=0):
+    def send_menu_keyboard(api, user_id, msg='Я снова здесь)', perms=0):
         
         keyboard = VkKeyboard(one_time=False)
 
@@ -17,6 +17,8 @@ class BotKeyboard(object):
         keyboard.add_button('Info', color=VkKeyboardColor.PRIMARY)
         keyboard.add_line() 
         keyboard.add_button('ДЗ', color=VkKeyboardColor.PRIMARY)
+        #keyboard.add_line()
+        #keyboard.add_button('Расписание', color=VkKeyboardColor.PRIMARY)
 
         keyboard.add_line()  
         keyboard.add_button('help', color=VkKeyboardColor.DEFAULT)

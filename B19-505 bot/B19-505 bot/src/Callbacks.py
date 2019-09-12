@@ -1,89 +1,131 @@
-import re
 from src.Logger import Log
-from src.db import db
+from src.db import db, Act
 from vk_api.utils import get_random_id
 from src.BotKeyboard import BotKeyboard
-from src.Diary import Subject, Diary
-from enum import Enum
-
-class Act(Enum):
-    Empty = 0
-    Report = 1
-    Send = 2
-    AddInfo = 3
-    AddHT   = 4
+from src.Diary import Subject, Diary, Info, Hometask
 
 def OnEventNew(api, event):
-    Log('MSG: ' + str(event.obj.from_id) + ' ' + event.obj.text)
+    user = event.obj.from_id
+    text = event.obj.text.lower()
 
-    if OnEventNew.act_id == Act.Report and event.obj.from_id == OnEventNew.user_id:
-        api.messages.send(user_id=event.obj.from_id, message='Спасибо за фидбэк!', reply_to=event.obj.id, random_id=get_random_id())
-        api.messages.send(user_id=142026123, message='[BUGREPORT]:\n' + event.obj.text, random_id=get_random_id())
-        OnEventNew.act_id = Act.Empty
-        return 
+    Log('MSG: ' + str(user))
 
-    if len(event.obj.text) == 0:
-        Log('ATTACHMENT')
-        api.messages.send(user_id=event.obj.from_id, message='Извини, но я тебя не понимаю', reply_to=event.obj.id, random_id=get_random_id())
-        return
-
-    pattern = re.compile(r'\w+')
-    cmd = pattern.findall(event.obj.text)[0]
+    #:   admins
 
     #:   editors
-    if event.obj.from_id in db.editors:
-        if OnEventNew.act_id == Act.Send and event.obj.from_id == OnEventNew.user_id:
+    if user in db.editors:
+        if db.last_action[user] == Act.Send:
+            if text == 'назад':
+                db.last_action[user] = Act.Empty    
+                BotKeyboard.send_editor_keyboard(api=api, user_id=user)                 
+                return
             for user_id in db.users:
-                if user_id != event.obj.from_id:
-                    api.messages.send(user_id=user_id, message=event.obj.text, random_id=get_random_id())
-
-            api.messages.send(user_id=event.obj.from_id, message='Рассылка выполнена', reply_to=event.obj.id, random_id=get_random_id())
-            OnEventNew.act_id = Act.Empty
+                if user_id != user:
+                    api.messages.send(user_id=user_id, message=text, random_id=get_random_id())
+            db.last_action[user] = Act.Empty
+            api.messages.send(user_id=user, message='Рассылка выполнена', reply_to=event.obj.id, random_id=get_random_id())
             return
-        elif cmd.lower() == 'назад':
-            BotKeyboard.send_menu_keyboard(api=api, user_id=event.obj.from_id, msg='Откатил', perms=5)
+        elif db.last_action[user] == Act.AddInfo:
+            if text == 'назад':
+                db.last_action[user] = Act.Choose
+                BotKeyboard.send_editor_keyboard_add(api=api, user_id=user)                    
+                return
+            if len(text) == 0:
+                text = 'Info'
+            Info.set_info(text, event.obj.attachments)
+            BotKeyboard.send_menu_keyboard(api=api, user_id=user, msg='Добавлено!', perms=5)
+            db.last_action[user] = Act.Empty
             return
-        elif cmd.lower() == 'editor':
-            BotKeyboard.send_editor_keyboard(api=api, user_id=event.obj.from_id)
+        elif db.last_action[user] == Act.Choose:
+            if text == 'дз':
+                db.last_action[user] = Act.AddHT_subj
+                BotKeyboard.send_ht_keyboard(api=api, user_id=user)
+                return
+            elif text == 'информация':
+                db.last_action[user] = Act.AddInfo
+                api.messages.send(user_id=user, message='Какой инфой хочешь поделиться?', random_id=get_random_id())
+                return
+            elif text == 'назад':
+                db.last_action[user] = Act.Empty
+                BotKeyboard.send_editor_keyboard_add(api=api, user_id=user)
+                return
+            else: 
+                db.last_action[user] = Act.Empty
+                BotKeyboard.send_menu_keyboard(api=api, user_id=user, msg='Давай по новой', perms=5)
+                return
+        elif db.last_action[user] == Act.AddHT_subj:
+            if text == 'назад':
+                db.last_action[user] = Act.Choose
+                BotKeyboard.send_editor_keyboard_add(api=api, user_id=user)
+                return
+            else:
+                for subj in Subject:
+                    if subj.value == text:
+                        db.last_action[user] = Act.AddHT_task
+                        Hometask.subj = subj.value
+                        api.messages.send(user_id=user, message='Добавляй!', random_id=get_random_id())
+                        return
+                db.last_action[user] = Act.Choose
+                api.messages.send(user_id=user, message='Я не знаю такого предмета...', reply_to=event.obj.id, random_id=get_random_id())
+                BotKeyboard.send_editor_keyboard_add(api=api, user_id=user)
+                return
+        elif db.last_action[user] == Act.AddHT_task:
+            if text == 'назад':
+                db.last_action[user] = Act.Choose
+                BotKeyboard.send_editor_keyboard_add(api=api, user_id=user)
+            else:
+                if len(text) == 0:
+                    text = 'Hometask'
+                Diary.set_ht(text, event.obj.attachments)
+                BotKeyboard.send_menu_keyboard(api=api, user_id=user, msg='Домашка добавлена!', perms=5)
+                db.last_action[user] = Act.Empty
             return
-        elif cmd.lower() == 'рaзослать':
-            OnEventNew.act_id = Act.Send
-            OnEventNew.user_id = event.obj.from_id
-            api.messages.send(user_id=event.obj.from_id, message='Каково будет сообщение?', reply_to=event.obj.id, random_id=get_random_id())
+        elif text == 'назад':
+            db.last_action[user] = Act.Empty
+            BotKeyboard.send_menu_keyboard(api=api, user_id=user, msg='Откатил', perms=5)       
             return
-        elif cmd.lower() == 'добавить':
-            BotKeyboard.send_editor_keyboard_add(api=api, user_id=event.obj.from_id)
+        elif text == 'editor':
+            BotKeyboard.send_editor_keyboard(api=api, user_id=user)
+            return
+        elif text == 'рaзослать':
+            db.last_action[user] = Act.Send
+            api.messages.send(user_id=user, message='Каково будет сообщение?', reply_to=event.obj.id, random_id=get_random_id())
+            return
+        elif text == 'добавить':
+            db.last_action[user] = Act.Choose
+            BotKeyboard.send_editor_keyboard_add(api=api, user_id=user)     
             return
 
     #:  users
-    if cmd.lower() == 'help':
-        api.messages.send(user_id=event.obj.from_id, message='start - подписаться на рассылку\nhelp - показать, что я умею\nreport - сообщить об ошибке', reply_to=event.obj.id, random_id=get_random_id())
-    elif cmd.lower() == 'start' or cmd.lower() == 'начать':
-        if db.add_user(event.obj.from_id) == True:
-            api.messages.send(user_id=event.obj.from_id, message='Теперь ты подписан на рассылку', reply_to=event.obj.id, random_id=get_random_id())
-
-            BotKeyboard.send_menu_keyboard(api, event.obj.from_id)
+    if db.last_action[user] == Act.Report:
+        db.last_action[user] = Act.Empty
+        if text != 'назад':
+            api.messages.send(user_id=142026123, message='[BUGREPORT]:\n' + text, random_id=get_random_id())
+        BotKeyboard.send_menu_keyboard(api=api, user_id=user, msg='Спасибо за фидбэк!') 
+    elif text == 'help':
+        api.messages.send(user_id=user, message='start - подписаться на рассылку\nhelp - показать, что я умею\nreport - сообщить об ошибке', reply_to=event.obj.id, random_id=get_random_id())
+    elif text == 'start' or text == 'начать':
+        if db.add_user(user) == True:
+            api.messages.send(user_id=user, message='Теперь ты подписан на рассылку', reply_to=event.obj.id, random_id=get_random_id())
+            BotKeyboard.send_menu_keyboard(api, user)
         else:
-            api.messages.send(user_id=event.obj.from_id, message='Ты уже подписан', reply_to=event.obj.id, random_id=get_random_id())
-    elif cmd.lower() == 'report':
-        OnEventNew.act_id = Act.Report
-        OnEventNew.user_id = event.obj.from_id
-        api.messages.send(user_id=event.obj.from_id, message='Опиши проблему', reply_to=event.obj.id, random_id=get_random_id())
-    elif cmd.lower() == 'info':
-        api.messages.send(user_id=event.obj.from_id, message='Последняя актуальная информация:\nundefined', reply_to=event.obj.id, random_id=get_random_id())
-    elif cmd.lower() == 'дз':
-        BotKeyboard.send_ht_keyboard(api=api, user_id=event.obj.from_id)
-    elif cmd.lower() == 'назад':
-        BotKeyboard.send_menu_keyboard(api=api, user_id=event.obj.from_id, msg='Откатил')
+            api.messages.send(user_id=user, message='Ты уже подписан', reply_to=event.obj.id, random_id=get_random_id())
+    elif text == 'report':
+        db.last_action[user] = Act.Report    
+        api.messages.send(user_id=user, message='Опиши проблему', reply_to=event.obj.id, random_id=get_random_id())
+    elif text == 'info':
+        Info.send_last_info(api, event.obj.id, user)
+    elif text == 'дз':
+        BotKeyboard.send_ht_keyboard(api=api, user_id=user)
+    elif text == 'назад':
+        BotKeyboard.send_menu_keyboard(api=api, user_id=user, msg='Откатил')
     else:
         for subj in Subject:
-            if subj.value == cmd.lower():
-                Diary.send_last_ht(api, event.obj.id, event.obj.from_id, subj.value)
+            if subj.value == text:
+                Diary.send_last_ht(api, event.obj.id, user, subj.value)
                 return
 
-        api.messages.send(user_id=event.obj.from_id, message='Извини, но я не умею отвечать на такой запрос', reply_to=event.obj.id, random_id=get_random_id())
-OnEventNew.act_id = Act.Empty
-OnEventNew.user_id = int()
+        api.messages.send(user_id=user, message='Извини, но я не умею отвечать на такой запрос', reply_to=event.obj.id, random_id=get_random_id())
 
 def OnEventJoin(api, event):
     Log('JOIN: ' + str(event.obj.user_id))
