@@ -124,6 +124,6 @@ dmypy.json
 .pyre/
 
 # Additional ingnores
-/data/*
-/config/*
-/logs/*
+data/
+config/
+logs/
