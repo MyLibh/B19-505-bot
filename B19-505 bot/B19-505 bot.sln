@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29230.47
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "B19-505 bot", "B19-505 bot\B19-505 bot.pyproj", "{E70E0DD7-FE19-446F-B22C-29E02AA7314A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E70E0DD7-FE19-446F-B22C-29E02AA7314A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E70E0DD7-FE19-446F-B22C-29E02AA7314A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CED0A229-8BC4-4F34-8C67-AFF66FDCE859}
+	EndGlobalSection
+EndGlobal
