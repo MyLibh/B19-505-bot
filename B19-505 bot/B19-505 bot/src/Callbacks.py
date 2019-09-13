@@ -32,7 +32,7 @@ def OnEventNew(api, event):
                 return
             if len(text) == 0:
                 text = 'Info'
-            Info.set_info(text, event.obj.attachments)
+            Info.set_info(event, event.obj.attachments)
             BotKeyboard.send_menu_keyboard(api=api, user_id=user, msg='Добавлено!', perms=5)
             db.last_action[user] = Act.Empty
             return

@@ -1,6 +1,11 @@
 import os
 from vk_api.utils import get_random_id
 from enum import Enum
+from src.Core import Core
+import requests
+from vk_api import VkUpload
+import vk_api
+from vk_api.longpoll import VkLongPoll, VkEventType
 
 class Subject(Enum):
     Angem = 'ангем'
@@ -30,7 +35,26 @@ class Diary(object):
 
                     msg = 'До: ' + dic['until'] + '\n' + 'Комментарий: ' + dic['comment'] + '\n'
                     # parse attach
-                    api.messages.send(user_id=user_id, message=msg, reply_to=msg_id, random_id=get_random_id())
+
+                    response = Core.session.get(
+                    'http://api.duckduckgo.com/',
+                        params={
+                            'q': event.text,
+                            'format': 'json'
+                        }
+                    ).json()
+
+                    text = response.get('AbstractText')
+                    image_url = response.get('Image')
+
+                    attachments = []
+                    if image_url:
+                        image = session.get(image_url, stream=True)
+                        photo = upload.photo_messages(photos=image.raw)[0]
+
+                        attachments.append('photo{}_{}'.format(photo['owner_id'], photo['id']))
+
+                    api.messages.send(user_id=user_id, message=msg, reply_to=msg_id, attachment=','.join(attachments), random_id=get_random_id())
                     return
         else:
             open(filename, 'x')
@@ -57,13 +81,13 @@ class Info(object):
 
         api.messages.send(user_id=user_id, message='Актуальная инфа отсутствует', reply_to=msg_id, random_id=get_random_id())
 
-    def set_info(text, attach):
+    def set_info(event, attach):
         if os.path.exists(Info.path) == False:
             open(Info.path, 'x')
 
-        with open(Info.path, 'w') as info:
-            info.write(text)
-            info.write('\nattach=')
-            for x in attach:
-                info.write(str(x) + ',')
+        #with open(Info.path, 'w') as info:
+         #   info.write(text)
+        #    info.write('\nattach=')
+        #    for x in attach:
+         #       info.write(str(x) + ',')
 
