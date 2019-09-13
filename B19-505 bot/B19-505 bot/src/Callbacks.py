@@ -17,7 +17,6 @@ def _get_attachs(attachments):
         # <type><owner_id>_<access_token>
         formatted.append(type + str(owner_id) + '_' + str(id) + str(access_key))
 
-    print(formatted)
     return formatted
 
 def OnEventNew(api, event):
