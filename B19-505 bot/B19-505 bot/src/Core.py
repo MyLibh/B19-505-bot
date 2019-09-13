@@ -31,25 +31,25 @@ class Core(object):
         db.load()
         Log('db loaded')
 
-    def _send_keyboards(text):
-        for user_id in db.users:
-            if user_id in db.admins:
-               BotKeyboard.send_menu_keyboard(Core.api, user_id, perms=31415926, msg=text)
-            elif user_id in db.editors:
-               BotKeyboard.send_menu_keyboard(Core.api, user_id, perms=5, msg=text)
-            else:
-               BotKeyboard.send_menu_keyboard(Core.api, user_id, msg=text)
+def _send_keyboards(text):
+    for user_id in db.users:
+        if user_id in db.admins:
+            BotKeyboard.send_menu_keyboard(Core.api, user_id, perms=31415926, msg=text)
+        elif user_id in db.editors:
+            BotKeyboard.send_menu_keyboard(Core.api, user_id, perms=5, msg=text)
+        else:
+            BotKeyboard.send_menu_keyboard(Core.api, user_id, msg=text)
 
-    def start(text='Bot started'):    
-        Core._send_keyboards(text)
-        Log('Bot started')
+def start(text='Bot started'):    
+    _send_keyboards(text)
+    Log('Bot started')
 
-        for event in Core.longpoll.listen():
-            if event.type == VkBotEventType.MESSAGE_NEW:
-                src.Callbacks.OnEventNew(Core.api, event)
-            elif event.type == VkBotEventType.GROUP_JOIN:
-                src.Callbacks.OnEventJoin(Core.api, event)
-            elif event.type == VkBotEventType.GROUP_LEAVE:
-                src.Callbacks.OnEventLeave(Core.api, event)
-            else:
-                src.Callbacks.onEventDefault(Core.api, event)            
+    for event in Core.longpoll.listen():
+        if event.type == VkBotEventType.MESSAGE_NEW:
+            src.Callbacks.OnEventNew(Core.api, event)
+        elif event.type == VkBotEventType.GROUP_JOIN:
+            src.Callbacks.OnEventJoin(Core.api, event)
+        elif event.type == VkBotEventType.GROUP_LEAVE:
+            src.Callbacks.OnEventLeave(Core.api, event)
+        else:
+            src.Callbacks.onEventDefault(Core.api, event)            

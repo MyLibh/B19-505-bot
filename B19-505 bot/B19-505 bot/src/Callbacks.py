@@ -4,9 +4,26 @@ from vk_api.utils import get_random_id
 from src.BotKeyboard import BotKeyboard
 from src.Diary import Subject, Diary, Info, Hometask
 
+def _get_attachs(attachments):
+    formatted = []
+    for attach in attachments:
+        type = attach['type']
+        owner_id = attach[type]['owner_id']
+        id = attach[type]['id']
+        access_key = ''
+        if 'access_key' in attach[type]:
+            access_key = '_' + attach[type]['access_key']
+
+        # <type><owner_id>_<access_token>
+        formatted.append(type + str(owner_id) + '_' + str(id) + str(access_key))
+
+    print(formatted)
+    return formatted
+
 def OnEventNew(api, event):
     user = event.obj.from_id
     text = event.obj.text.lower()
+    atts = event.obj.attachments
 
     Log('MSG: ' + str(user))
 
@@ -30,9 +47,9 @@ def OnEventNew(api, event):
                 db.last_action[user] = Act.Choose
                 BotKeyboard.send_editor_keyboard_add(api=api, user_id=user)                    
                 return
-            if len(text) == 0:
-                text = 'Info'
-            Info.set_info(event, event.obj.attachments)
+            if len(event.obj.text) == 0:
+                event.obj.text = 'Info'
+            Info.set_info(event.obj.text, _get_attachs(atts))
             BotKeyboard.send_menu_keyboard(api=api, user_id=user, msg='Добавлено!', perms=5)
             db.last_action[user] = Act.Empty
             return
@@ -74,9 +91,9 @@ def OnEventNew(api, event):
                 db.last_action[user] = Act.Choose
                 BotKeyboard.send_editor_keyboard_add(api=api, user_id=user)
             else:
-                if len(text) == 0:
-                    text = 'Hometask'
-                Diary.set_ht(text, event.obj.attachments)
+                if len(event.obj.text) == 0:
+                    event.obj.text = 'Hometask'
+                Diary.set_ht(event.obj.text, _get_attachs(atts), Hometask.subj)
                 BotKeyboard.send_menu_keyboard(api=api, user_id=user, msg='Домашка добавлена!', perms=5)
                 db.last_action[user] = Act.Empty
             return
