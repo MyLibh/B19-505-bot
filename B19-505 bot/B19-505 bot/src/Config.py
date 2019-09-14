@@ -1,3 +1,5 @@
+import json
+
 class Config(object):
     token = None
     group_id = None
@@ -5,10 +7,8 @@ class Config(object):
     def load(config_filename):
         dic = {}
         with open(config_filename) as cred:
-            for line in cred.readlines():
-                tmp = line.split('=')
-                dic[tmp[0]] = tmp[1].replace('\n', '')
+            data = json.loads(cred.read())
 
-        Config.token    = dic['token']
-        Config.group_id = dic['group_id']
+        Config.token    = data['token']
+        Config.group_id = data['group_id']
 

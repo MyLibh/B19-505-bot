@@ -6,4 +6,5 @@ import src.BotKeyboard
 import src.Diary
 import src.Core
 import src.LongPoll
+import src.Util
 

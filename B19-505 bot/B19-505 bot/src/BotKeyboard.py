@@ -1,24 +1,31 @@
 from vk_api.keyboard import VkKeyboard, VkKeyboardColor
 from vk_api.utils import get_random_id
+from enum import Enum
 
+class BKPerms(Enum):
+    USER = 0
+    EDITOR = 10
+    ADMIN = 100
 
 class BotKeyboard(object):
-    def send_menu_keyboard(api, user_id, msg='Я снова здесь)', perms=0):
+    def send_menu_keyboard(api, user_id, msg='Я снова здесь)', perms=BKPerms.USER):
         
         keyboard = VkKeyboard(one_time=False)
 
-        if perms == 5:
-            keyboard.add_button('Editor', color=VkKeyboardColor.POSITIVE)
-            keyboard.add_line()
-        elif perms == 31415926:
+        if perms == BKPerms.ADMIN:
             keyboard.add_button('Admin', color=VkKeyboardColor.POSITIVE)
             keyboard.add_line()
 
+        if perms == BKPerms.ADMIN or perms == BKPerms.EDITOR:
+            keyboard.add_button('Editor', color=VkKeyboardColor.POSITIVE)
+            keyboard.add_line()
+        
         keyboard.add_button('Info', color=VkKeyboardColor.PRIMARY)
         keyboard.add_line() 
         keyboard.add_button('ДЗ', color=VkKeyboardColor.PRIMARY)
-        #keyboard.add_line()
-        #keyboard.add_button('Расписание', color=VkKeyboardColor.PRIMARY)
+        # TODO: send shedule
+        # keyboard.add_line() 
+        # eyboard.add_button('Расписание', color=VkKeyboardColor.PRIMARY)
 
         keyboard.add_line()  
         keyboard.add_button('help', color=VkKeyboardColor.DEFAULT)
@@ -68,3 +75,14 @@ class BotKeyboard(object):
         keyboard.add_button('Назад', color=VkKeyboardColor.DEFAULT)
 
         api.messages.send(peer_id=user_id, random_id=get_random_id(), keyboard=keyboard.get_keyboard(), message='Меню добавления открыто!')
+
+    def send_admin_keyboard(api, user_id):
+        keyboard = VkKeyboard(one_time=False)
+
+        keyboard.add_button('Demote', color=VkKeyboardColor.NEGATIVE)
+        keyboard.add_button('Promote', color=VkKeyboardColor.POSITIVE)
+
+        keyboard.add_line()
+        keyboard.add_button('Назад', color=VkKeyboardColor.DEFAULT)
+
+        api.messages.send(peer_id=user_id, random_id=get_random_id(), keyboard=keyboard.get_keyboard(), message='Hello, Dear deer)')

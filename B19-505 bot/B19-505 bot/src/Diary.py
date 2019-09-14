@@ -41,7 +41,7 @@ class Diary(object):
 
         with open(filename, 'w') as task:
             task.write('text=')
-            task.write(text)
+            task.write(text) # TODO: check encoding for windows
             task.write('\nattach=')
             task.write(','.join(attach))
 
@@ -70,7 +70,7 @@ class Info(object):
 
         with open(Info.path, 'w') as info:
             info.write('text=')
-            info.write(text)
+            info.write(text) # TODO: check encoding for windows
             info.write('\nattach=')
             info.write(','.join(attach))
 
