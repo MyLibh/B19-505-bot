@@ -5,7 +5,6 @@ class Config(object):
     group_id = None
 
     def load(config_filename):
-        dic = {}
         with open(config_filename) as cred:
             data = json.loads(cred.read())
 
