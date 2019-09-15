@@ -10,6 +10,7 @@ class Act(Enum):
     AddHT_task = 7
     Demote = 8
     Promote = 9
+    GetClassbook = 10
 
 class db(object):
     users = set()

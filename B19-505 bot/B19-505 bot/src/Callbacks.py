@@ -1,3 +1,4 @@
+import io
 from src.Logger import Log
 from src.db import db, Act
 from vk_api.utils import get_random_id
@@ -70,7 +71,11 @@ def _handle_editors(api, user, text, atts, msg_id):
                 if len(text) == 0:
                     text = 'Info'
                 Info.set_info(text, get_attachs(atts))
-                BotKeyboard.send_menu_keyboard(api=api, user_id=user, msg='Добавлено!', perms=BKPerms.EDITOR)
+                perms = BKPerms.EDITOR
+                if user in db.admins:
+                    perms = BKPerms.ADMIN
+
+                BotKeyboard.send_menu_keyboard(api=api, user_id=user, msg='Добавлено!', perms=perms)
                 db.last_action[user] = Act.Empty
         elif db.last_action[user] == Act.Choose:
             if text == 'дз':
@@ -84,7 +89,10 @@ def _handle_editors(api, user, text, atts, msg_id):
                 BotKeyboard.send_editor_keyboard_add(api=api, user_id=user)
             else: 
                 db.last_action[user] = Act.Empty
-                BotKeyboard.send_menu_keyboard(api=api, user_id=user, msg='Давай по новой', perms=BKPerms.EDITOR)
+                perms = BKPerms.EDITOR
+                if user in db.admins:
+                    perms = BKPerms.ADMIN
+                BotKeyboard.send_menu_keyboard(api=api, user_id=user, msg='Давай по новой', perms=perms)
         elif db.last_action[user] == Act.AddHT_subj:
             if text == 'назад':
                 db.last_action[user] = Act.Choose
@@ -107,7 +115,10 @@ def _handle_editors(api, user, text, atts, msg_id):
                 if len(text) == 0:
                     text = 'Hometask'
                 Diary.set_ht(text, get_attachs(atts), Hometask.subj)
-                BotKeyboard.send_menu_keyboard(api=api, user_id=user, msg='Домашка добавлена!', perms=BKPerms.EDITOR)
+                perms = BKPerms.EDITOR
+                if user in db.admins:
+                    perms = BKPerms.ADMIN
+                BotKeyboard.send_menu_keyboard(api=api, user_id=user, msg='Домашка добавлена!', perms=perms)
                 db.last_action[user] = Act.Empty
         elif text == 'назад':
             db.last_action[user] = Act.Empty
@@ -133,6 +144,25 @@ def _handle_users(api, user, text, atts, msg_id):
             if text != 'назад':
                 api.messages.send(domain='big_black_hot_brother', message='[BUGREPORT]:\n' + text, random_id=get_random_id())
             BotKeyboard.send_menu_keyboard(api=api, user_id=user, msg='Спасибо за фидбэк!') 
+        elif db.last_action[user] == Act.GetClassbook:
+            if text == 'назад':
+                 db.last_action[user] = Act.Empty
+            else:
+                for subj in Subject:
+                    if subj.value == text:
+                        with io.open('data/classbooks.json', 'r', encoding='utf-8-sig') as file: 
+                            data = json.loads(file.read())
+                            str = 'Держи!'
+                            if len(data[text]) == 0:
+                                str = 'У меня их нет'
+                            api.messages.send(user_id=user, message=str, attachment=data[text], random_id=get_random_id())
+                        return True
+                perms = BKPerms.USER
+                if user in db.editors:
+                    perms = BKPerms.EDITOR
+                elif user in db.admins:
+                    perms = BKPerms.ADMIN
+                BotKeyboard.send_menu_keyboard(api=api, user_id=user, msg='Я не знаю такого предмета...', perms=perms)    
         elif text == 'help':
             api.messages.send(user_id=user, message='start - подписаться на рассылку\nhelp - показать, что я умею\nreport - сообщить об ошибке', reply_to=msg_id, random_id=get_random_id())
         elif text == 'start' or text == 'начать' or text == 'старт':
@@ -148,6 +178,15 @@ def _handle_users(api, user, text, atts, msg_id):
             BotKeyboard.send_menu_keyboard(api=api, user_id=user, msg='Откатил')
         elif text == 'расписание':
             BotKeyboard.send_shedule_keyboard(api, user)
+        elif text == 'завтра':
+            Shedule.send_shedule_tomorrow(api, user, msg_id)
+        elif text == 'сегодня':
+            Shedule.send_shedule_today(api, user, msg_id)
+        elif text == 'полное':
+            Shedule.send_full_shedule(api, user, msg_id)
+        elif text == 'учебники':
+            db.last_action[user] = Act.GetClassbook
+            BotKeyboard.send_ht_keyboard(api=api, user_id=user)
         elif is_subject(text):
             Diary.send_last_ht(api, msg_id, user, text)
         else:

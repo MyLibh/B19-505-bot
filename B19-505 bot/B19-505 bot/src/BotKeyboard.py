@@ -19,8 +19,10 @@ class BotKeyboard(object):
             keyboard.add_button('Editor', color=VkKeyboardColor.POSITIVE)
             keyboard.add_line()
         
-        #keyboard.add_button('Расписание', color=VkKeyboardColor.PRIMARY)
-        #keyboard.add_line()
+        keyboard.add_button('Учебники', color=VkKeyboardColor.PRIMARY)
+        keyboard.add_button('Расписание', color=VkKeyboardColor.PRIMARY)
+        
+        keyboard.add_line()
         keyboard.add_button('Info', color=VkKeyboardColor.PRIMARY)
         keyboard.add_button('ДЗ', color=VkKeyboardColor.PRIMARY)
 
@@ -96,6 +98,9 @@ class BotKeyboard(object):
 
         keyboard.add_button('Завтра', color=VkKeyboardColor.PRIMARY)
         keyboard.add_button('Сегодня', color=VkKeyboardColor.PRIMARY)
+        
+        keyboard.add_line()
+        keyboard.add_button('Полное', color=VkKeyboardColor.PRIMARY)
 
         keyboard.add_line()
         keyboard.add_button('Назад', color=VkKeyboardColor.DEFAULT)

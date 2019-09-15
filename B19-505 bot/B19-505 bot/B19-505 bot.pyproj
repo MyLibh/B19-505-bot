@@ -67,6 +67,9 @@
       <SubType>Code</SubType>
     </Content>
     <Content Include="data\admins.txt" />
+    <Content Include="data\classbooks.json">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="data\editors.txt" />
     <Content Include="data\shedule.json">
       <SubType>Code</SubType>
