@@ -28,6 +28,9 @@ class Core(object):
         Core.upload   = VkUpload(Core.session)
         Log('Authed')
 
+        if  Core.api.groups.getOnlineStatus(group_id=Config.group_id)['status'] == 'none':
+            Core.api.groups.enableOnline(group_id=Config.group_id)
+
         db.load()
         Log('db loaded')
 
