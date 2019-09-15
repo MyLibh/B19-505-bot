@@ -86,3 +86,10 @@ class BotKeyboard(object):
         keyboard.add_button('Назад', color=VkKeyboardColor.DEFAULT)
 
         api.messages.send(peer_id=user_id, random_id=get_random_id(), keyboard=keyboard.get_keyboard(), message='Hello, Dear deer)')
+
+    def send_report_keyboard(api, user_id):
+        keyboard = VkKeyboard(one_time=True)
+
+        keyboard.add_button('Назад', color=VkKeyboardColor.DEFAULT)
+
+        api.messages.send(peer_id=user_id, random_id=get_random_id(), keyboard=keyboard.get_keyboard(), message='Опиши проблему')

@@ -12,7 +12,7 @@ def OnEventNew(api, event):
 
     Log('MSG: ' + str(user))
 
-    #:   admins
+    #: admins
     if user in db.admins:
         if db.last_action[user] == Act.Demote:
             if text == 'назад':
@@ -57,7 +57,7 @@ def OnEventNew(api, event):
             BotKeyboard.send_menu_keyboard(api=api, user_id=user, msg='Откатил', perms=BKPerms.ADMIN)       
             return
 
-    #:   editors
+    #: editors
     if user in db.editors:
         if db.last_action[user] == Act.Send:
             if text == 'назад':
@@ -141,7 +141,7 @@ def OnEventNew(api, event):
             BotKeyboard.send_editor_keyboard_add(api=api, user_id=user)     
             return
 
-    #:  users
+    #: users
     if user in db.users:
         if db.last_action[user] == Act.Report:
             db.last_action[user] = Act.Empty
@@ -153,8 +153,8 @@ def OnEventNew(api, event):
         elif text == 'start' or text == 'начать' or text == 'старт':
              api.messages.send(user_id=user, message='Ты уже подписан', reply_to=event.obj.id, random_id=get_random_id())
         elif text == 'report':
-            db.last_action[user] = Act.Report    
-            api.messages.send(user_id=user, message='Опиши проблему', reply_to=event.obj.id, random_id=get_random_id())
+            db.last_action[user] = Act.Report 
+            BotKeyboard.send_report_keyboard(api, user)
         elif text == 'info':
             Info.send_last_info(api, event.obj.id, user)
         elif text == 'дз':
@@ -169,6 +169,7 @@ def OnEventNew(api, event):
 
             api.messages.send(user_id=user, message='Извини, но я не умею отвечать на такой запрос', reply_to=event.obj.id, random_id=get_random_id())
 
+    #: cunts
     if user not in db.users:
         if text == 'start' or text == 'начать' or text == 'старт':
             if db.add_user(user) == True:

@@ -65,6 +65,9 @@
     </Content>
     <Content Include="data\admins.txt" />
     <Content Include="data\editors.txt" />
+    <Content Include="data\Shedule.json">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="data\users.txt" />
     <Content Include="logs\log-2019-09-08.log" />
   </ItemGroup>
