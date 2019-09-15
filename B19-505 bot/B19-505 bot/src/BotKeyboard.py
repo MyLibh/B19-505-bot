@@ -14,18 +14,15 @@ class BotKeyboard(object):
 
         if perms == BKPerms.ADMIN:
             keyboard.add_button('Admin', color=VkKeyboardColor.POSITIVE)
-            keyboard.add_line()
 
         if perms == BKPerms.ADMIN or perms == BKPerms.EDITOR:
             keyboard.add_button('Editor', color=VkKeyboardColor.POSITIVE)
             keyboard.add_line()
         
+        #keyboard.add_button('Расписание', color=VkKeyboardColor.PRIMARY)
+        #keyboard.add_line()
         keyboard.add_button('Info', color=VkKeyboardColor.PRIMARY)
-        keyboard.add_line() 
         keyboard.add_button('ДЗ', color=VkKeyboardColor.PRIMARY)
-        # TODO: send shedule
-        # keyboard.add_line() 
-        # eyboard.add_button('Расписание', color=VkKeyboardColor.PRIMARY)
 
         keyboard.add_line()  
         keyboard.add_button('help', color=VkKeyboardColor.DEFAULT)
@@ -93,3 +90,14 @@ class BotKeyboard(object):
         keyboard.add_button('Назад', color=VkKeyboardColor.DEFAULT)
 
         api.messages.send(peer_id=user_id, random_id=get_random_id(), keyboard=keyboard.get_keyboard(), message='Опиши проблему')
+
+    def send_shedule_keyboard(api, user_id):
+        keyboard = VkKeyboard(one_time=False)
+
+        keyboard.add_button('Завтра', color=VkKeyboardColor.PRIMARY)
+        keyboard.add_button('Сегодня', color=VkKeyboardColor.PRIMARY)
+
+        keyboard.add_line()
+        keyboard.add_button('Назад', color=VkKeyboardColor.DEFAULT)
+
+        api.messages.send(peer_id=user_id, random_id=get_random_id(), keyboard=keyboard.get_keyboard(), message='Что интересует?')

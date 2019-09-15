@@ -4,6 +4,7 @@ from vk_api.utils import get_random_id
 from src.BotKeyboard import BotKeyboard, BKPerms
 from src.Diary import *
 from src.Util import *
+from src.Shedule import Shedule
 
 def _handle_admins(api, user, text, atts, msg_id):
     if user in db.admins:
@@ -130,7 +131,7 @@ def _handle_users(api, user, text, atts, msg_id):
         if db.last_action[user] == Act.Report:
             db.last_action[user] = Act.Empty
             if text != 'назад':
-                api.messages.send(user_id=142026123, message='[BUGREPORT]:\n' + text, random_id=get_random_id())
+                api.messages.send(domain='big_black_hot_brother', message='[BUGREPORT]:\n' + text, random_id=get_random_id())
             BotKeyboard.send_menu_keyboard(api=api, user_id=user, msg='Спасибо за фидбэк!') 
         elif text == 'help':
             api.messages.send(user_id=user, message='start - подписаться на рассылку\nhelp - показать, что я умею\nreport - сообщить об ошибке', reply_to=msg_id, random_id=get_random_id())
@@ -145,6 +146,8 @@ def _handle_users(api, user, text, atts, msg_id):
             BotKeyboard.send_ht_keyboard(api=api, user_id=user)
         elif text == 'назад':
             BotKeyboard.send_menu_keyboard(api=api, user_id=user, msg='Откатил')
+        elif text == 'расписание':
+            BotKeyboard.send_shedule_keyboard(api, user)
         elif is_subject(text):
             Diary.send_last_ht(api, msg_id, user, text)
         else:

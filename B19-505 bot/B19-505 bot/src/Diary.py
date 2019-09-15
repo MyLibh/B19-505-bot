@@ -49,11 +49,11 @@ class Diary(object):
                file.write(str(json.dumps(data, ensure_ascii=False, indent=4)))
 
 class Info(object):
-    path = 'data/Hometask/info.json'
+    PATH = 'data/Hometask/info.json'
 
     def send_last_info(api, msg_id, user_id):
-        if os.path.exists(Info.path):
-            with open(Info.path, 'r', encoding='utf-8') as file:
+        if os.path.exists(Info.PATH):
+            with open(Info.PATH, 'r', encoding='utf-8') as file:
                 data = json.loads(file.read())
                 
                 api.messages.send(user_id=user_id, message=data['text'], attachment=data['attachment'], reply_to=msg_id, random_id=get_random_id())
@@ -61,11 +61,11 @@ class Info(object):
             api.messages.send(user_id=user_id, message='Актуальная инфа отсутствует', reply_to=msg_id, random_id=get_random_id())
 
     def set_info(text, attach):
-        if os.path.exists(Info.path) == False:
-            open(Info.path, 'x')
+        if os.path.exists(Info.PATH) == False:
+            open(Info.PATH, 'x')
 
         data = {'text': text, 'attachment': attach}
-        with open(Info.path, 'w', encoding='utf-8') as file:
+        with open(Info.PATH, 'w', encoding='utf-8') as file:
            try:
                file.write(unicode(json.dumps(data, ensure_ascii=False, indent=4)))
            except NameError:
