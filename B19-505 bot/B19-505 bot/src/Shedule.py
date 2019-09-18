@@ -25,7 +25,7 @@ class Shedule(object):
         with io.open(Shedule.PATH, 'r', encoding='utf-8-sig') as file:  
             data = json.load(file)
             text = ''
-            for lesson in data['weeks'][Shedule._get_cur_week()][Shedule._get_weekday()]:
+            for lesson in data['weeks'][Shedule._get_cur_week(date.today() + datetime.timedelta(hours=3))][Shedule._get_weekday((date.today() + datetime.timedelta(hours=3)).weekday())]:
                 text += '[' + lesson['time'] + ']\n' + lesson['type'] + ' ' + lesson['subj'] + '\n' + lesson['teacher'] + '\n' + lesson['spot'] + '\n\n'
 
             if len(text) == 0:
@@ -37,8 +37,8 @@ class Shedule(object):
         with io.open(Shedule.PATH, 'r', encoding='utf-8-sig') as file:  
             data = json.load(file)
             text = ''
-            week = Shedule._get_cur_week(date.today() + datetime.timedelta(days=1))
-            weekday = Shedule._get_weekday((date.today() + datetime.timedelta(days=1)).weekday())
+            week = Shedule._get_cur_week(date.today() + datetime.timedelta(days=1, hours=3))
+            weekday = Shedule._get_weekday((date.today() + datetime.timedelta(days=1, hours=3)).weekday())
             for lesson in data['weeks'][week][weekday]:
                 text += '[' + lesson['time'] + ']\n' + lesson['type'] + ' ' + lesson['subj'] + '\n' + lesson['teacher'] + '\n' + lesson['spot'] + '\n\n'
 

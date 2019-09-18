@@ -1,3 +1,5 @@
+import io
+import json
 from enum import Enum
 
 class Act(Enum):
@@ -13,60 +15,53 @@ class Act(Enum):
     GetClassbook = 10
 
 class db(object):
-    users = set()
+    PATH = 'data/users.json'
+
+    users = {}
     last_action = {}
-    editors = set()
-    admins = set()
 
-    def _get_filename_by_db(dbase):
-        if dbase is db.users:
-            return 'users'
-        elif dbase is db.editors:
-            return 'editors'
-        else:
-            return 'admins'
+    def _read():
+        with io.open(db.PATH, 'r', encoding='utf-8-sig') as file:  
+            db.users = json.load(file)
+                
+    def _write():
+        with io.open(db.PATH, 'w', encoding='utf-8-sig') as file:
+            try:
+               file.write(unicode(json.dumps(db.users, ensure_ascii=False, indent=4)))
+            except NameError:
+               file.write(str(json.dumps(db.users, ensure_ascii=False, indent=4)))
 
-    def _read(dbase):
-        with open('data/' + db._get_filename_by_db(dbase) + '.txt') as file:
-            for user in file.readlines():
-                dbase.add(int(user))
-
-    def _write(dbase):
-        with open('data/' + db._get_filename_by_db(dbase) + '.txt', 'w') as file:
-            for user in dbase:
-                file.write(str(user) + '\n')
-
-    def _add_to_db(dbase, id):
-        if id not in dbase:
-            dbase.add(id)
+    def _add_to_db(id, role='user'):
+        if id not in db.users:
+            db.users[id] = role
             db.last_action[id] = Act.Empty
-            db._write(dbase)
+            db._write()
 
             return True
         else:
             return False
 
-    def _rem_from_db(dbase, id):
-        dbase.discard(id)
-
-        db._write(dbase)
+    def _rem_from_db(id, role=''):
+        if len(role) == 0:
+            db.users.pop(id)
+        else:
+            db.users[id] = role
+        db._write()
 
     def load():
-        db._read(db.users)
-        db._read(db.editors)
-        db._read(db.admins)
+        db._read()
 
-        for user in db.users:
-            db.last_action[user] = Act.Empty
+        for user_id in db.users:
+            db.last_action[int(user_id)] = Act.Empty
 
     def add_user(id):
-        return db._add_to_db(db.users, id)
+        return db._add_to_db(str(id))
 
     def remove_user(id):
-        db._rem_from_db(db.users, id)
+        db._rem_from_db(str(id))
 
     def add_editor(id):
-        return db._add_to_db(db.editors, id)
+        return db._add_to_db(str(id), 'editor')
 
     def remove_editor(id):
-        db._rem_from_db(db.editors, id)
+        db._rem_from_db(str(id), 'user')

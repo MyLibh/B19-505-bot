@@ -2,20 +2,14 @@ from vk_api.keyboard import VkKeyboard, VkKeyboardColor
 from vk_api.utils import get_random_id
 from enum import Enum
 
-class BKPerms(Enum):
-    USER = 0
-    EDITOR = 10
-    ADMIN = 100
-
 class BotKeyboard(object):
-    def send_menu_keyboard(api, user_id, msg='Я снова здесь)', perms=BKPerms.USER):
-        
+    def send_menu_keyboard(api, user_id, msg='Я снова здесь)', perms='user'):     
         keyboard = VkKeyboard(one_time=False)
 
-        if perms == BKPerms.ADMIN:
+        if perms == 'admin':
             keyboard.add_button('Admin', color=VkKeyboardColor.POSITIVE)
 
-        if perms == BKPerms.ADMIN or perms == BKPerms.EDITOR:
+        if perms == 'admin' or perms == 'editor':
             keyboard.add_button('Editor', color=VkKeyboardColor.POSITIVE)
             keyboard.add_line()
         

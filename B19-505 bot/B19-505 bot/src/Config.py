@@ -1,11 +1,13 @@
 import json
 
 class Config(object):
+    PATH = 'config/credentials.json'
+
     token = None
     group_id = None
 
-    def load(config_filename):
-        with open(config_filename) as cred:
+    def load():
+        with open(Config.PATH) as cred:
             data = json.loads(cred.read())
 
         Config.token    = data['token']

@@ -2,20 +2,20 @@ import io
 from src.Logger import Log
 from src.db import db, Act
 from vk_api.utils import get_random_id
-from src.BotKeyboard import BotKeyboard, BKPerms
+from src.BotKeyboard import BotKeyboard
 from src.Diary import *
 from src.Util import *
 from src.Shedule import Shedule
 
 def _handle_admins(api, user, text, atts, msg_id):
-    if user in db.admins:
+    if db.users[str(user)] == 'admin':
         if db.last_action[user] == Act.Demote:
             if text == 'назад':
                 db.last_action[user] = Act.Empty    
                 BotKeyboard.send_admin_keyboard(api=api, user_id=user)               
             else:
                 id = get_user_id(api, text)
-                if id in db.editors:
+                if db.users[str(user)] == 'editor':
                     db.remove_editor(id)
                     BotKeyboard.send_menu_keyboard(api=api, user_id=id, msg='Тебя понизили')
                     api.messages.send(user_id=user, message='Demoted', reply_to=msg_id, random_id=get_random_id())
@@ -29,7 +29,7 @@ def _handle_admins(api, user, text, atts, msg_id):
             else:
                 id = get_user_id(api, text)
                 if db.add_editor(id) == True:
-                    BotKeyboard.send_menu_keyboard(api=api, user_id=id, msg='Поздравляю!\nТеперь ты редактор', perms=BKPerms.EDITOR)
+                    BotKeyboard.send_menu_keyboard(api=api, user_id=id, msg='Поздравляю!\nТеперь ты редактор', perms=db.users[str(user)])
                     api.messages.send(user_id=user, message='Promoted', reply_to=msg_id, random_id=get_random_id())
                 else:
                     api.messages.send(user_id=user, message='Already editor', reply_to=msg_id, random_id=get_random_id())
@@ -44,7 +44,7 @@ def _handle_admins(api, user, text, atts, msg_id):
             api.messages.send(user_id=user, message='Enter acc link to promote', reply_to=msg_id, random_id=get_random_id())
         elif text == 'назад':
             db.last_action[user] = Act.Empty
-            BotKeyboard.send_menu_keyboard(api=api, user_id=user, msg='Откатил', perms=BKPerms.ADMIN)       
+            BotKeyboard.send_menu_keyboard(api=api, user_id=user, msg='Откатил', perms='admin')       
         else:
             return False
         return True
@@ -52,15 +52,15 @@ def _handle_admins(api, user, text, atts, msg_id):
         return False
         
 def _handle_editors(api, user, text, atts, msg_id):
-    if user in db.editors:
+    if db.users[str(user)] == 'editor' or db.users[str(user)] == 'admin':
         if db.last_action[user] == Act.Send:
             if text == 'назад':
                 db.last_action[user] = Act.Empty    
                 BotKeyboard.send_editor_keyboard(api=api, user_id=user)                 
             else:
                 for user_id in db.users:
-                    if user_id != user:
-                        api.messages.send(user_id=user_id, message=text, attachment=get_attachs(atts), random_id=get_random_id())
+                    if int(user_id) != user:
+                        api.messages.send(user_id=int(user_id), message=text, attachment=get_attachs(atts), random_id=get_random_id())
                 db.last_action[user] = Act.Empty
                 api.messages.send(user_id=user, message='Рассылка выполнена', reply_to=msg_id, random_id=get_random_id())
         elif db.last_action[user] == Act.AddInfo:
@@ -71,11 +71,7 @@ def _handle_editors(api, user, text, atts, msg_id):
                 if len(text) == 0:
                     text = 'Info'
                 Info.set_info(text, get_attachs(atts))
-                perms = BKPerms.EDITOR
-                if user in db.admins:
-                    perms = BKPerms.ADMIN
-
-                BotKeyboard.send_menu_keyboard(api=api, user_id=user, msg='Добавлено!', perms=perms)
+                BotKeyboard.send_menu_keyboard(api=api, user_id=user, msg='Добавлено!', perms=db.users[str(user)])
                 db.last_action[user] = Act.Empty
         elif db.last_action[user] == Act.Choose:
             if text == 'дз':
@@ -89,10 +85,7 @@ def _handle_editors(api, user, text, atts, msg_id):
                 BotKeyboard.send_editor_keyboard_add(api=api, user_id=user)
             else: 
                 db.last_action[user] = Act.Empty
-                perms = BKPerms.EDITOR
-                if user in db.admins:
-                    perms = BKPerms.ADMIN
-                BotKeyboard.send_menu_keyboard(api=api, user_id=user, msg='Давай по новой', perms=perms)
+                BotKeyboard.send_menu_keyboard(api=api, user_id=user, msg='Давай по новой', perms=db.users[str(user)])
         elif db.last_action[user] == Act.AddHT_subj:
             if text == 'назад':
                 db.last_action[user] = Act.Choose
@@ -115,14 +108,11 @@ def _handle_editors(api, user, text, atts, msg_id):
                 if len(text) == 0:
                     text = 'Hometask'
                 Diary.set_ht(text, get_attachs(atts), Hometask.subj)
-                perms = BKPerms.EDITOR
-                if user in db.admins:
-                    perms = BKPerms.ADMIN
-                BotKeyboard.send_menu_keyboard(api=api, user_id=user, msg='Домашка добавлена!', perms=perms)
+                BotKeyboard.send_menu_keyboard(api=api, user_id=user, msg='Домашка добавлена!', perms=db.users[str(user)])
                 db.last_action[user] = Act.Empty
         elif text == 'назад':
             db.last_action[user] = Act.Empty
-            BotKeyboard.send_menu_keyboard(api=api, user_id=user, msg='Откатил', perms=BKPerms.EDITOR)       
+            BotKeyboard.send_menu_keyboard(api=api, user_id=user, msg='Откатил', perms=db.users[str(user)])       
         elif text == 'editor':
             BotKeyboard.send_editor_keyboard(api=api, user_id=user)
         elif text == 'рaзослать':
@@ -138,7 +128,7 @@ def _handle_editors(api, user, text, atts, msg_id):
         return False
 
 def _handle_users(api, user, text, atts, msg_id):
-    if user in db.users:
+    if db.users[str(user)] == 'user' or db.users[str(user)] == 'editor' or db.users[str(user)] == 'admin':
         if db.last_action[user] == Act.Report:
             db.last_action[user] = Act.Empty
             if text != 'назад':
@@ -152,17 +142,12 @@ def _handle_users(api, user, text, atts, msg_id):
                     if subj.value == text:
                         with io.open('data/classbooks.json', 'r', encoding='utf-8-sig') as file: 
                             data = json.loads(file.read())
-                            str = 'Держи!'
+                            tmp = 'Держи!'
                             if len(data[text]) == 0:
-                                str = 'У меня их нет'
-                            api.messages.send(user_id=user, message=str, attachment=data[text], random_id=get_random_id())
+                                tmp = 'У меня их нет'
+                            api.messages.send(user_id=user, message=tmp, attachment=data[text], random_id=get_random_id())
                         return True
-                perms = BKPerms.USER
-                if user in db.editors:
-                    perms = BKPerms.EDITOR
-                elif user in db.admins:
-                    perms = BKPerms.ADMIN
-                BotKeyboard.send_menu_keyboard(api=api, user_id=user, msg='Я не знаю такого предмета...', perms=perms)    
+                BotKeyboard.send_menu_keyboard(api=api, user_id=user, msg='Я не знаю такого предмета...', perms=db.users[str(user)])    
         elif text == 'help':
             api.messages.send(user_id=user, message='start - подписаться на рассылку\nhelp - показать, что я умею\nreport - сообщить об ошибке', reply_to=msg_id, random_id=get_random_id())
         elif text == 'start' or text == 'начать' or text == 'старт':
