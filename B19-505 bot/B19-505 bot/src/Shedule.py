@@ -8,13 +8,13 @@ from vk_api.utils import get_random_id
 class Shedule(object):
     PATH = 'data/shedule.json'
 
-    def _get_cur_week(cur_day=date.today()):
-        if int(date(2019, 9, 1).isocalendar()[1] - cur_day.isocalendar()[1] + 1) % 2 == 0:
+    def _get_cur_week(cur_day):
+        if int(cur_day.isocalendar()[1] - date(2019, 9, 1).isocalendar()[1]) % 2 == 0:
             return 'even'
         else:
             return 'odd'
 
-    def _get_weekday(weekday=date.today().weekday()):
+    def _get_weekday(weekday):
         return calendar.day_name[weekday]
 
 # [time]
@@ -25,7 +25,7 @@ class Shedule(object):
         with io.open(Shedule.PATH, 'r', encoding='utf-8-sig') as file:  
             data = json.load(file)
             text = ''
-            for lesson in data['weeks'][Shedule._get_cur_week(date.today() + datetime.timedelta(hours=3))][Shedule._get_weekday((date.today() + datetime.timedelta(hours=3)).weekday())]:
+            for lesson in data['weeks'][Shedule._get_cur_week(datetime.datetime.now() + datetime.timedelta(hours=3))][Shedule._get_weekday((datetime.datetime.now() + datetime.timedelta(hours=3)).weekday())]:
                 text += '[' + lesson['time'] + ']\n' + lesson['type'] + ' ' + lesson['subj'] + '\n' + lesson['teacher'] + '\n' + lesson['spot'] + '\n\n'
 
             if len(text) == 0:
@@ -37,8 +37,8 @@ class Shedule(object):
         with io.open(Shedule.PATH, 'r', encoding='utf-8-sig') as file:  
             data = json.load(file)
             text = ''
-            week = Shedule._get_cur_week(date.today() + datetime.timedelta(days=1, hours=3))
-            weekday = Shedule._get_weekday((date.today() + datetime.timedelta(days=1, hours=3)).weekday())
+            week = Shedule._get_cur_week(datetime.datetime.now() + datetime.timedelta(days=1, hours=3))
+            weekday = Shedule._get_weekday((datetime.datetime.now() + datetime.timedelta(days=1, hours=3)).weekday())
             for lesson in data['weeks'][week][weekday]:
                 text += '[' + lesson['time'] + ']\n' + lesson['type'] + ' ' + lesson['subj'] + '\n' + lesson['teacher'] + '\n' + lesson['spot'] + '\n\n'
 
