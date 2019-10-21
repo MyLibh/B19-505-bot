@@ -32,10 +32,11 @@ class db(object):
                file.write(str(json.dumps(db.users, ensure_ascii=False, indent=4)))
 
     def _add_to_db(id, role='user'):
-        if id not in db.users:
+        if id not in db.users or db.users[id] != role:
             db.users[id] = role
             db.last_action[id] = Act.Empty
             db._write()
+            db._read() # smth went wrong
 
             return True
         else:

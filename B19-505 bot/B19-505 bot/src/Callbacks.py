@@ -8,6 +8,9 @@ from src.Util import *
 from src.Shedule import Shedule
 
 def _handle_admins(api, user, text, atts, msg_id):
+    if str(user) not in db.users:
+        return False;
+
     if db.users[str(user)] == 'admin':
         if db.last_action[user] == Act.Demote:
             if text == 'назад':
@@ -15,7 +18,7 @@ def _handle_admins(api, user, text, atts, msg_id):
                 BotKeyboard.send_admin_keyboard(api=api, user_id=user)               
             else:
                 id = get_user_id(api, text)
-                if db.users[str(user)] == 'editor':
+                if db.users[str(id)] == 'editor':
                     db.remove_editor(id)
                     BotKeyboard.send_menu_keyboard(api=api, user_id=id, msg='Тебя понизили')
                     api.messages.send(user_id=user, message='Demoted', reply_to=msg_id, random_id=get_random_id())
@@ -29,7 +32,7 @@ def _handle_admins(api, user, text, atts, msg_id):
             else:
                 id = get_user_id(api, text)
                 if db.add_editor(id) == True:
-                    BotKeyboard.send_menu_keyboard(api=api, user_id=id, msg='Поздравляю!\nТеперь ты редактор', perms=db.users[str(user)])
+                    BotKeyboard.send_menu_keyboard(api=api, user_id=id, msg='Поздравляю!\nТеперь ты редактор', perms=db.users[str(id)])
                     api.messages.send(user_id=user, message='Promoted', reply_to=msg_id, random_id=get_random_id())
                 else:
                     api.messages.send(user_id=user, message='Already editor', reply_to=msg_id, random_id=get_random_id())
@@ -188,15 +191,17 @@ def OnEventNew(api, event):
 
     Log('MSG: ' + str(user))
 
-    if _handle_admins(api, user, text, atts, msg_id) == False:
-        if _handle_editors(api, user, text, atts, msg_id) == False:
-            if _handle_users(api, user, text, atts, msg_id) == False:
-                if text == 'start' or text == 'начать' or text == 'старт':
-                    if db.add_user(user) == True:
-                        api.messages.send(user_id=user, message='Теперь ты подписан на рассылку', reply_to=msg_id, random_id=get_random_id())
-                        BotKeyboard.send_menu_keyboard(api, user)
-                    else:
-                        api.messages.send(user_id=user, message='Отправь start/начать/старт, чтобы подписаться', reply_to=msg_id, random_id=get_random_id())
+    if str(user) in db.users:
+        if _handle_admins(api, user, text, atts, msg_id) == False:
+            if _handle_editors(api, user, text, atts, msg_id) == False:
+                _handle_users(api, user, text, atts, msg_id);
+    else:
+        if text == 'start' or text == 'начать' or text == 'старт':
+            if db.add_user(user) == True:
+                api.messages.send(user_id=user, message='Теперь ты подписан на рассылку', reply_to=msg_id, random_id=get_random_id())
+                BotKeyboard.send_menu_keyboard(api, user)
+        else:
+            api.messages.send(user_id=user, message='Отправь start/начать/старт, чтобы подписаться', reply_to=msg_id, random_id=get_random_id())
         
 def OnEventJoin(api, event):
     Log('JOIN: ' + str(event.obj.user_id))
