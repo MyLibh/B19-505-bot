@@ -107,7 +107,7 @@ def _handle_editors(api, user, text, atts, msg_id):
             if text == 'назад':
                 db.last_action[user] = Act.Choose
                 BotKeyboard.send_editor_keyboard_add(api=api, user_id=user)
-            else:
+            else: 
                 if len(text) == 0:
                     text = 'Hometask'
                 Diary.set_ht(text, get_attachs(atts), Hometask.subj)
@@ -186,8 +186,8 @@ def _handle_users(api, user, text, atts, msg_id):
 def OnEventNew(api, event):
     user = event.obj.from_id
     text = event.obj.text.lower()
-    atts = event.obj.attachments
     msg_id = event.obj.id
+    atts = Core.api.messages.getById(message_ids=msg_id, preview_length=0, extended=0)['items'][0]['attachments']
 
     Log('MSG: ' + str(user))
 

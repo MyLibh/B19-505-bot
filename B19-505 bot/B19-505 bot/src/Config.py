@@ -12,4 +12,3 @@ class Config(object):
 
         Config.token    = data['token']
         Config.group_id = data['group_id']
-
