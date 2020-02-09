@@ -30,11 +30,11 @@ class BotKeyboard(object):
         keyboard = VkKeyboard(one_time=False)
 
         
-        keyboard.add_button('Ангем', color=VkKeyboardColor.PRIMARY)
+        keyboard.add_button('Линал', color=VkKeyboardColor.PRIMARY)
         keyboard.add_button('Матан', color=VkKeyboardColor.PRIMARY)
 
         keyboard.add_line() 
-        keyboard.add_button('тч', color=VkKeyboardColor.PRIMARY)
+        keyboard.add_button('ТЧ', color=VkKeyboardColor.PRIMARY)
         keyboard.add_button('Инфа', color=VkKeyboardColor.PRIMARY)
 
         keyboard.add_line() 
