@@ -5,7 +5,7 @@ from vk_api.utils import get_random_id
 from src.Core import Core
 
 class Subject(Enum):
-    Angem = 'ангем'
+    Angem = 'линал'
     Matan = 'матан'
     Inf = 'инфа'
     History = 'история' 
