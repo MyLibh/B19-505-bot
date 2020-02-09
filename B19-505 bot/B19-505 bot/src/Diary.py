@@ -7,11 +7,11 @@ from src.Core import Core
 class Subject(Enum):
     Angem = 'ангем'
     Matan = 'матан'
-    Evm = 'эвм'
     Inf = 'инфа'
-    Ogz = 'огз' 
+    History = 'история' 
     Phys = 'физика'
-    Disc = 'дискретка'
+    Disc = 'комба'
+    NumTheory = 'тч'
 
 def is_subject(text):
     for subj in Subject:
@@ -70,5 +70,3 @@ class Info(object):
                file.write(unicode(json.dumps(data, ensure_ascii=False, indent=4)))
            except NameError:
                file.write(str(json.dumps(data, ensure_ascii=False, indent=4)))
-
-

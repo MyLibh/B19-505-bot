@@ -34,13 +34,13 @@ class BotKeyboard(object):
         keyboard.add_button('Матан', color=VkKeyboardColor.PRIMARY)
 
         keyboard.add_line() 
-        keyboard.add_button('ЭВМ', color=VkKeyboardColor.PRIMARY)
+        keyboard.add_button('тч', color=VkKeyboardColor.PRIMARY)
         keyboard.add_button('Инфа', color=VkKeyboardColor.PRIMARY)
 
         keyboard.add_line() 
-        keyboard.add_button('ОГЗ', color=VkKeyboardColor.PRIMARY)
+        keyboard.add_button('История', color=VkKeyboardColor.PRIMARY)
         keyboard.add_button('Физика', color=VkKeyboardColor.PRIMARY)
-        keyboard.add_button('Дискретка', color=VkKeyboardColor.PRIMARY)
+        keyboard.add_button('Комба', color=VkKeyboardColor.PRIMARY)
 
         keyboard.add_line()
         keyboard.add_button('Назад', color=VkKeyboardColor.DEFAULT)

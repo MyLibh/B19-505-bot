@@ -64,20 +64,16 @@
     <Folder Include="src\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="config\credentials.json">
-      <SubType>Code</SubType>
-    </Content>
+    <Content Include="config\credentials.json" />
     <Content Include="data\classbooks.json">
       <SubType>Code</SubType>
     </Content>
     <Content Include="data\Hometask\info.json" />
+    <Content Include="data\users.json" />
     <Content Include="data\Hometask\ангем.json" />
     <Content Include="data\Hometask\дискретка.json" />
     <Content Include="data\Hometask\матан.json" />
     <Content Include="data\shedule.json">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="data\users.json">
       <SubType>Code</SubType>
     </Content>
     <Content Include="logs\log-2019-09-08.log" />
